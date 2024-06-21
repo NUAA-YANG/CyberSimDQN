@@ -48,3 +48,70 @@ EternalBlue = Vulnerability(
     vul_confidentiality="high",
     vul_probability=0.7
 )
+
+
+"""
+EternalBlue = Service(
+        "EternalBlue",
+        "CVE-2017-014",
+        "Windows7",
+        "Exploiting vulnerabilities in SMB services on Windows systems",
+        "medium", "short", "yes", "user", "high", 0.7)
+    # BlueKeep CVE-2019-0708
+    # Windows远程桌面服务远程代码执行漏洞，它影响了Windows操作系统的远程桌面服务（RDP）
+    BlueKeep = Service(
+        "BlueKeep",
+        "CVE-2019-0708",
+        "WindowsXP",
+        "Exploiting Remote Desktop Services Vulnerability in Windows System",
+        "medium", "medium", "yes", "root", "exHigh", 0.6)
+    # Spring4Shell CVE-2022-22965
+    # 该漏洞影响SpringFramework，攻击者可以利用该漏洞执行远程代码
+    Spring4Shell = Service(
+        "Spring4Shell",
+        "CVE-2022-22965",
+        "Ubuntu",
+        "Exploiting Java application vulnerabilities in the Spring Framework",
+        "medium", "short", "yes", "user", "exHigh", 0.5)
+    # MySQLServer CVE-2020-2574
+    # MySQL Server 中的存储过程中存在一个漏洞，允许本地攻击者通过利用某些未授权的特性提升权限
+    MySQLServer = Service(
+        "MySQLServer",
+        "CVE-2020-0601",
+        "Windows10",
+        "Exploiting this vulnerability to forge digital certificates",
+        "low", "medium", "no", "user", "low", 0.6)
+    # Log4J CVE-2021-44228
+    # 攻击者可以通过特制的日志消息执行远程代码
+    Log4J = Service(
+        "Log4J",
+        "CVE-2021-44228",
+        "Ubuntu",
+        "Exploiting service vulnerabilities using Apache Log4j 2 library",
+        "low", "long", "no", "user", "medium", 0.7)
+    # Struts2 CVE-2018-11776
+    # Apache Web应用框架中的一个远程代码执行漏洞
+    Struts2 = Service(
+        "Struts2",
+        "CVE-2018-11776",
+        "Ubuntu",
+        "Exploiting a Remote Code Vulnerability in the Apache Web Application Framework",
+        "low", "medium", "no", "user", "low", 0.4)
+    # PrintNightmare CVE-2021-34527
+    # 漏洞影响Windows打印后台处理程序服务，攻击者可以利用这个漏洞执行远程代码或获得系统权限。
+    PrintNightmare = Service(
+        "PrintNightmare",
+        "CVE-2021-34527",
+        "Windows10",
+        "Exploiting Windows Print Spooler Service Vulnerability",
+        "high", "medium", "yes", "root", "low", 0.6)
+    # SMBGhost CVE-2020-0796
+    # 漏洞存在于SMBv3协议中，允许攻击者在未授权的情况下远程执行代码
+    SMBGhost = Service(
+        "SMBGhost",
+        "CVE-2020-0796",
+        "Windows10",
+        "Exploiting SMBv3 protocol vulnerabilities",
+        "high", "long", "yes", "user", "high", 0.5)
+
+"""
