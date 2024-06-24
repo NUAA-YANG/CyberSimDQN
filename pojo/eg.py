@@ -18,7 +18,6 @@ my_firewall = Firewall(
     fw_state="running"
 )
 
-
 """
 ================================本地漏洞，不存在远程连接节点，没有通信协议和端口===========================
 """
@@ -28,8 +27,6 @@ EternalBlue = Vulnerability(
     vul_id=1,
     vul_cve="CVE-2017-014",
     vul_type="local",
-    vul_voucher=[2],
-    vul_to_node_id=[],
     vul_port=0,
     vul_protocol="",
     vul_os="Windows7",
@@ -48,8 +45,6 @@ PrintNightmare = Vulnerability(
     vul_id=2,
     vul_cve="CVE-2021-34527",
     vul_type="local",
-    vul_voucher=[3],
-    vul_to_node_id=[],
     vul_port=0,
     vul_protocol="",
     vul_os="Windows10",
@@ -68,8 +63,6 @@ BaronSamedit = Vulnerability(
     vul_id=3,
     vul_cve="CVE-2021-3156",
     vul_type="local",
-    vul_voucher=[2],
-    vul_to_node_id=[],
     vul_port=0,
     vul_protocol="",
     vul_os="Ubuntu",
@@ -91,8 +84,6 @@ BlueKeep = Vulnerability(
     vul_id=4,
     vul_cve="CVE-2019-0708",
     vul_type="remote",
-    vul_voucher=[],
-    vul_to_node_id=[4],
     vul_port=3389,
     vul_protocol="TCP",
     vul_os="Windows7",
@@ -111,8 +102,6 @@ Spring4Shell = Vulnerability(
     vul_id=5,
     vul_cve="CVE-2022-22965",
     vul_type="remote",
-    vul_voucher=[],
-    vul_to_node_id=[4],
     vul_port=80,
     vul_protocol="HTTP",
     vul_os="Ubuntu",
@@ -131,8 +120,6 @@ OracleWebLogicServer = Vulnerability(
     vul_id=6,
     vul_cve="CVE-2020-2574",
     vul_type="remote",
-    vul_voucher=[],
-    vul_to_node_id=[4],
     vul_port=7001,
     vul_protocol="HTTP",
     vul_os="Windows10",
@@ -151,8 +138,6 @@ Log4Shell = Vulnerability(
     vul_id=7,
     vul_cve="CVE-2021-44228",
     vul_type="remote",
-    vul_voucher=[],
-    vul_to_node_id=[4],
     vul_port=443,
     vul_protocol="HTTPS",
     vul_os="Ubuntu",
@@ -171,8 +156,6 @@ Struts2 = Vulnerability(
     vul_id=8,
     vul_cve="CVE-2018-11776",
     vul_type="remote",
-    vul_voucher=[],
-    vul_to_node_id=[4],
     vul_port=443,
     vul_protocol="HTTPS",
     vul_os="Windows10",
@@ -185,15 +168,16 @@ Struts2 = Vulnerability(
     vul_probability=0.4
 )
 
-
 # 节点
 one = Node(
     node_name="one",
     node_id=1,
     node_type="pc",
-    node_os="ubuntu",
+    node_os="Ubuntu",
     node_ip="192.168.1.1",
     node_services=["ApacheLog4j", "MySQL"],
-    node_vul_id=[EternalBlue, BlueKeep],
+    node_vul={
+        EternalBlue: [2], BlueKeep: [5, 6]
+    },
     node_value=10
 )
