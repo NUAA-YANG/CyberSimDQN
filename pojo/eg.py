@@ -19,7 +19,9 @@ my_firewall = Firewall(
 )
 
 """
-================================本地漏洞，不存在远程连接节点，没有通信协议和端口===========================
+================================本地漏洞=====================================
+1. 定义为本地攻击
+2. 通过横向移动到相邻的节点上
 """
 # 永恒之蓝漏洞,它利用了Windows系统的SMB（Server Message Block）服务中的漏洞
 EternalBlue = Vulnerability(
@@ -27,8 +29,8 @@ EternalBlue = Vulnerability(
     vul_id=1,
     vul_cve="CVE-2017-014",
     vul_type="local",
-    vul_port=0,
-    vul_protocol="",
+    vul_port=445,
+    vul_protocol="TCP",
     vul_os="Windows",
     vul_desc="Exploiting vulnerabilities in SMB services on Windows systems",
     vul_complexity="medium",
@@ -45,8 +47,8 @@ PrintNightmare = Vulnerability(
     vul_id=2,
     vul_cve="CVE-2021-34527",
     vul_type="local",
-    vul_port=0,
-    vul_protocol="",
+    vul_port=445,
+    vul_protocol="TCP",
     vul_os="Windows",
     vul_desc="Exploiting Windows Print Spooler Service Vulnerability",
     vul_complexity="high",
@@ -57,14 +59,14 @@ PrintNightmare = Vulnerability(
     vul_probability=0.6
 )
 
-# 该漏洞影响使用Sudo的Unix-like操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
+# 该漏洞影响使用Sudo的Linux操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
 BaronSamedit = Vulnerability(
     vul_name="BaronSamedit",
     vul_id=3,
     vul_cve="CVE-2021-3156",
     vul_type="local",
-    vul_port=0,
-    vul_protocol="",
+    vul_port=80,
+    vul_protocol="TCP",
     vul_os="Linux",
     vul_desc="Exploiting BaronSamedit vulnerability to elevate permissions",
     vul_complexity="high",
@@ -76,7 +78,9 @@ BaronSamedit = Vulnerability(
 )
 
 """
-================================远程漏洞，不存在泄露凭证，存在通信协议和端口===========================
+================================远程漏洞========================================
+1. 定义为远程攻击
+2. 通过横向移动到相邻和非相邻的节点上
 """
 # Windows远程桌面服务远程代码执行漏洞，它影响了Windows操作系统的远程桌面服务（RDP）
 BlueKeep = Vulnerability(
@@ -122,7 +126,7 @@ OracleWebLogicServer = Vulnerability(
     vul_type="remote",
     vul_port=7001,
     vul_protocol="HTTP",
-    vul_os="Windows",
+    vul_os="Linux",
     vul_desc="Exploiting this vulnerability to forge digital certificates",
     vul_complexity="low",
     vul_persistence="medium",
@@ -169,6 +173,7 @@ Struts2 = Vulnerability(
 )
 
 # 节点
+# 设置本地漏洞和远程漏洞都可以连接到某个节点上
 one = Node(
     node_name="one",
     node_id=1,
@@ -177,7 +182,7 @@ one = Node(
     node_ip="192.168.1.1",
     node_services=["ApacheLog4j", "MySQL"],
     node_vul={
-        EternalBlue: [2], BlueKeep: [5, 6]
+        EternalBlue: [2], BlueKeep: [5]
     },
     node_value=10
 )
