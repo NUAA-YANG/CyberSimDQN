@@ -28,6 +28,7 @@ my_firewall = Firewall(
 2. 通过横向移动到相邻的节点上
 """
 # 永恒之蓝漏洞,它利用了Windows系统的SMB（Server Message Block）服务中的漏洞
+# 概括：存在Windows中，攻破后的移动可自定义
 EternalBlue = Vulnerability(
     vul_name="EternalBlue",
     vul_id=1,
@@ -48,6 +49,7 @@ EternalBlue = Vulnerability(
 )
 
 # 漏洞影响Windows打印后台处理程序服务，攻击者可以利用这个漏洞执行远程代码或获得系统权限。
+# 概括：存在Windows中，攻破后的移动可自定义
 PrintNightmare = Vulnerability(
     vul_name="PrintNightmare",
     vul_id=2,
@@ -68,6 +70,7 @@ PrintNightmare = Vulnerability(
 )
 
 # 该漏洞影响使用Sudo的Linux操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
+# 概括：存在Linux中，攻破后的移动可自定义
 BaronSamedit = Vulnerability(
     vul_name="BaronSamedit",
     vul_id=3,
@@ -94,6 +97,7 @@ BaronSamedit = Vulnerability(
 """
 # 产生于：Windows远程桌面服务远程代码执行漏洞
 # 影响：攻破后，可访问另一台Windows电脑
+# 概括：存在Windows中，攻破后可访问另一个Windows主机
 BlueKeep = Vulnerability(
     vul_name="BlueKeep",
     vul_id=4,
@@ -115,6 +119,7 @@ BlueKeep = Vulnerability(
 
 # 产生于：漏洞存在于Java开发框架Spring的Core模块中
 # 影响：攻破后，该漏洞可影响web服务，即可访问存在web服务的电脑
+# 概括：存在Spring框架中，攻破后可访问存在Web服务的主机
 Spring4Shell = Vulnerability(
     vul_name="Spring4Shell",
     vul_id=5,
@@ -136,6 +141,7 @@ Spring4Shell = Vulnerability(
 
 # 产生于：漏洞存在于Oracle WebLogic Server的控制台组件和管理控制台
 # 影响：攻破后，该漏洞可控制Oracle数据库服务器
+# 概括：存在Oracle中，攻破后可访问存在Oracle Server服务的主机
 OracleWebLogicServer = Vulnerability(
     vul_name="OracleWebLogicServer",
     vul_id=6,
@@ -157,6 +163,7 @@ OracleWebLogicServer = Vulnerability(
 
 # 产生于：漏洞存在于Apache Log4j 2中的JNDI功能（即一种java日志框架）
 # 影响：攻破后，该漏洞可访问存在Log4j（日志服务）的应用程序
+# 概括：存在Apache Log4j中，攻破后可访问存在Apache Log4j服务的主机
 Log4Shell = Vulnerability(
     vul_name="Log4Shell",
     vul_id=7,
@@ -178,6 +185,7 @@ Log4Shell = Vulnerability(
 
 # 产生于：漏洞存在于Java开发框架Apache Struts2的文件上传组件
 # 影响：攻破后，攻击者可以利用该漏洞访问和控制web应用程序
+# 概括：存在Apache Struts2中，攻破后可访问存在Apache Web服务的主机
 Struts2 = Vulnerability(
     vul_name="Struts2",
     vul_id=8,
@@ -213,7 +221,7 @@ one = Node(
     node_ip="192.168.1.1",
     node_services=["ApacheLog4j", "MySQL"],
     node_vul={
-        EternalBlue: [2], BlueKeep: [5]
+        EternalBlue: 2, BlueKeep: 5
     },
     node_value=10
 )
