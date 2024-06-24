@@ -15,18 +15,7 @@ my_firewall = Firewall(
     fw_ip="192.168.1.1",
     fw_rule={"source": "192.168.90.1/24", "destination": "192.168.100.1/24",
              "port": "80", "protocol": "TCP", "action": "deny"},
-    fw_state="running")
-
-# 节点
-one = Node(
-    node_name="one",
-    node_id=1,
-    node_type="pc",
-    node_os="ubuntu",
-    node_ip="192.168.1.1",
-    node_services=["ApacheLog4j", "MySQL"],
-    node_vul_id=[2, 6],
-    node_value=10
+    fw_state="running"
 )
 
 # 永恒之蓝漏洞,它利用了Windows系统的SMB（Server Message Block）服务中的漏洞
@@ -35,9 +24,9 @@ EternalBlue = Vulnerability(
     vul_id=1,
     vul_cve="CVE-2017-014",
     vul_type="local",
-    vul_voucher=[2, 5],
+    vul_voucher=[2],
     vul_to_node_id=[],
-    vul_port=80,
+    vul_port=445,
     vul_protocol="TCP",
     vul_os="Windows7",
     vul_desc="Exploiting vulnerabilities in SMB services on Windows systems",
@@ -49,6 +38,37 @@ EternalBlue = Vulnerability(
     vul_probability=0.7
 )
 
+# Windows远程桌面服务远程代码执行漏洞，它影响了Windows操作系统的远程桌面服务（RDP）
+BlueKeep = Vulnerability(
+    vul_name="BlueKeep",
+    vul_id=2,
+    vul_cve="CVE-2019-0708",
+    vul_type="remote",
+    vul_voucher=[],
+    vul_to_node_id=[4],
+    vul_port=3389,
+    vul_protocol="TCP",
+    vul_os="WindowsXP",
+    vul_desc="Exploiting Remote Desktop Services Vulnerability in Windows System",
+    vul_complexity="medium",
+    vul_persistence="medium",
+    vul_interaction="yes",
+    vul_authority="root",
+    vul_confidentiality="exHigh",
+    vul_probability=0.6
+)
+
+# 节点
+one = Node(
+    node_name="one",
+    node_id=1,
+    node_type="pc",
+    node_os="ubuntu",
+    node_ip="192.168.1.1",
+    node_services=["ApacheLog4j", "MySQL"],
+    node_vul_id=[EternalBlue, BlueKeep],
+    node_value=10
+)
 
 """
 EternalBlue = Service(
