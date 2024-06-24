@@ -7,7 +7,11 @@
 from firewall import Firewall
 from node import Node
 from vulnerability import Vulnerability
+from calculate.vulCal import calculate
 
+"""
+================================防火墙====================================
+"""
 # 防火墙
 my_firewall = Firewall(
     fw_name="my_firewall",
@@ -38,7 +42,9 @@ EternalBlue = Vulnerability(
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="high",
-    vul_probability=0.7
+    vul_probability=0.7,
+    vul_reward=22,
+    vul_cost=18
 )
 
 # 漏洞影响Windows打印后台处理程序服务，攻击者可以利用这个漏洞执行远程代码或获得系统权限。
@@ -56,7 +62,9 @@ PrintNightmare = Vulnerability(
     vul_interaction="yes",
     vul_authority="root",
     vul_confidentiality="low",
-    vul_probability=0.6
+    vul_probability=0.6,
+    vul_reward=15,
+    vul_cost=25
 )
 
 # 该漏洞影响使用Sudo的Linux操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
@@ -74,7 +82,9 @@ BaronSamedit = Vulnerability(
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="high",
-    vul_probability=0.5
+    vul_probability=0.5,
+    vul_reward=24,
+    vul_cost=16
 )
 
 """
@@ -82,7 +92,8 @@ BaronSamedit = Vulnerability(
 1. 定义为远程攻击
 2. 通过横向移动到相邻和非相邻的节点上
 """
-# Windows远程桌面服务远程代码执行漏洞，它影响了Windows操作系统的远程桌面服务（RDP）
+# 产生于：Windows远程桌面服务远程代码执行漏洞
+# 影响：攻破后，可访问另一台Windows电脑
 BlueKeep = Vulnerability(
     vul_name="BlueKeep",
     vul_id=4,
@@ -97,10 +108,13 @@ BlueKeep = Vulnerability(
     vul_interaction="yes",
     vul_authority="root",
     vul_confidentiality="exHigh",
-    vul_probability=0.6
+    vul_probability=0.6,
+    vul_reward=23,
+    vul_cost=17
 )
 
-# 该漏洞影响SpringFramework，攻击者可以利用该漏洞执行远程代码
+# 产生于：漏洞存在于Java开发框架Spring的Core模块中
+# 影响：攻破后，该漏洞可影响web服务，即可访问存在web服务的电脑
 Spring4Shell = Vulnerability(
     vul_name="Spring4Shell",
     vul_id=5,
@@ -110,15 +124,18 @@ Spring4Shell = Vulnerability(
     vul_protocol="HTTP",
     vul_os="Linux",
     vul_desc="Exploiting Java application vulnerabilities in the Spring Framework",
-    vul_complexity="medium",
-    vul_persistence="short",
+    vul_complexity="low",
+    vul_persistence="low",
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="exHigh",
-    vul_probability=0.5
+    vul_probability=0.5,
+    vul_reward=31,
+    vul_cost=9
 )
 
-# Oracle WebLogic Server中的高危漏洞，允许本地攻击者通过利用某些未授权的特性提升权限
+# 产生于：漏洞存在于Oracle WebLogic Server的控制台组件和管理控制台
+# 影响：攻破后，该漏洞可控制Oracle数据库服务器
 OracleWebLogicServer = Vulnerability(
     vul_name="OracleWebLogicServer",
     vul_id=6,
@@ -129,14 +146,17 @@ OracleWebLogicServer = Vulnerability(
     vul_os="Linux",
     vul_desc="Exploiting this vulnerability to forge digital certificates",
     vul_complexity="low",
-    vul_persistence="medium",
+    vul_persistence="long",
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="low",
-    vul_probability=0.6
+    vul_probability=0.6,
+    vul_reward=27,
+    vul_cost=13
 )
 
-# 攻击者可以通过特制的日志消息执行远程代码
+# 产生于：漏洞存在于Apache Log4j 2中的JNDI功能（即一种java日志框架）
+# 影响：攻破后，该漏洞可访问存在Log4j（日志服务）的应用程序
 Log4Shell = Vulnerability(
     vul_name="Log4Shell",
     vul_id=7,
@@ -151,10 +171,13 @@ Log4Shell = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="medium",
-    vul_probability=0.7
+    vul_probability=0.7,
+    vul_reward=29,
+    vul_cost=11
 )
 
-# Apache Web应用框架中的一个远程代码执行漏洞
+# 产生于：漏洞存在于Java开发框架Apache Struts2的文件上传组件
+# 影响：攻破后，攻击者可以利用该漏洞访问和控制web应用程序
 Struts2 = Vulnerability(
     vul_name="Struts2",
     vul_id=8,
@@ -169,9 +192,17 @@ Struts2 = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="low",
-    vul_probability=0.4
+    vul_probability=0.4,
+    vul_reward=25,
+    vul_cost=15
 )
 
+"""
+================================节点========================================
+1. 每个抽象网络节点存在1-3个漏洞，漏洞为本地漏洞或远程漏洞，可移动到相应节点
+2. 每个节点只有一种操作系统，则漏洞适配操作系统应该与节点匹配
+3. 利用字典存储所有的节点
+"""
 # 节点
 # 设置本地漏洞和远程漏洞都可以连接到某个节点上
 one = Node(
@@ -186,3 +217,22 @@ one = Node(
     },
     node_value=10
 )
+
+two = Node(
+    node_name="one",
+    node_id=2,
+    node_type="pc",
+    node_os="Ubuntu",
+    node_ip="192.168.1.1",
+    node_services=["ApacheLog4j", "MySQL"],
+    node_vul={
+        EternalBlue: [2], BlueKeep: [5]
+    },
+    node_value=10
+)
+# 这里继续描述节点和漏洞情况
+
+
+# 存放所有节点的字典(需要把所有节点补充进去)
+nodeList = {1: one, 2: two}
+
