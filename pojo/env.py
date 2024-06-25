@@ -35,7 +35,7 @@ EternalBlue = Vulnerability(
     vul_cve="CVE-2017-014",
     vul_type="local",
     vul_port=445,
-    vul_protocol="TCP",
+    vul_protocol="SMB",
     vul_os="Windows",
     vul_desc="Exploiting vulnerabilities in SMB services on Windows systems",
     vul_complexity="medium",
@@ -43,7 +43,7 @@ EternalBlue = Vulnerability(
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="high",
-    vul_probability=0.7,
+    vul_probability=0.8,
     vul_reward=22,
     vul_cost=18
 )
@@ -55,8 +55,8 @@ PrintNightmare = Vulnerability(
     vul_id=2,
     vul_cve="CVE-2021-34527",
     vul_type="local",
-    vul_port=445,
-    vul_protocol="TCP",
+    vul_port=135,
+    vul_protocol="RPC",
     vul_os="Windows",
     vul_desc="Exploiting Windows Print Spooler Service Vulnerability",
     vul_complexity="high",
@@ -64,7 +64,7 @@ PrintNightmare = Vulnerability(
     vul_interaction="yes",
     vul_authority="root",
     vul_confidentiality="low",
-    vul_probability=0.6,
+    vul_probability=0.7,
     vul_reward=15,
     vul_cost=25
 )
@@ -85,7 +85,7 @@ BaronSamedit = Vulnerability(
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="high",
-    vul_probability=0.5,
+    vul_probability=0.6,
     vul_reward=24,
     vul_cost=16
 )
@@ -104,7 +104,7 @@ BlueKeep = Vulnerability(
     vul_cve="CVE-2019-0708",
     vul_type="remote",
     vul_port=3389,
-    vul_protocol="TCP",
+    vul_protocol="RDP",
     vul_os="Windows",
     vul_desc="Exploiting Remote Desktop Services Vulnerability in Windows System",
     vul_complexity="medium",
@@ -112,7 +112,7 @@ BlueKeep = Vulnerability(
     vul_interaction="yes",
     vul_authority="root",
     vul_confidentiality="exHigh",
-    vul_probability=0.6,
+    vul_probability=0.7,
     vul_reward=23,
     vul_cost=17
 )
@@ -134,7 +134,7 @@ Spring4Shell = Vulnerability(
     vul_interaction="yes",
     vul_authority="user",
     vul_confidentiality="exHigh",
-    vul_probability=0.5,
+    vul_probability=0.7,
     vul_reward=31,
     vul_cost=9
 )
@@ -156,7 +156,7 @@ OracleWebLogicServer = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="low",
-    vul_probability=0.6,
+    vul_probability=0.5,
     vul_reward=27,
     vul_cost=13
 )
@@ -178,7 +178,7 @@ Log4Shell = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="medium",
-    vul_probability=0.7,
+    vul_probability=0.9,
     vul_reward=29,
     vul_cost=11
 )
@@ -200,7 +200,7 @@ Struts2 = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="low",
-    vul_probability=0.4,
+    vul_probability=0.6,
     vul_reward=25,
     vul_cost=15
 )
@@ -217,30 +217,94 @@ one = Node(
     node_name="one",
     node_id=1,
     node_type="pc",
-    node_os="Ubuntu",
+    node_os="Linux",
     node_ip="192.168.1.1",
-    node_services=["ApacheLog4j", "MySQL"],
+    node_services=["Shell", "Spring Framework", "Oracle Server", "Apache Log4j"],
     node_vul={
-        EternalBlue: 2, BlueKeep: 5
+        BaronSamedit: 10, Spring4Shell: 12
     },
     node_value=10
 )
 
-two = Node(
-    node_name="one",
-    node_id=2,
+three = Node(
+    node_name="three",
+    node_id=3,
     node_type="pc",
-    node_os="Ubuntu",
-    node_ip="192.168.1.1",
-    node_services=["ApacheLog4j", "MySQL"],
+    node_os="Linux",
+    node_ip="192.168.1.3",
+    node_services=["Shell"],
     node_vul={
-        EternalBlue: [2], BlueKeep: [5]
+        BaronSamedit: 5
     },
     node_value=10
 )
-# 这里继续描述节点和漏洞情况
 
+# 这里继续描述节点和漏洞情况
+five = Node(
+    node_name="five",
+    node_id=5,
+    node_type="pc",
+    node_os="Windows",
+    node_ip="192.168.1.5",
+    node_services=["Print Spooler", "Spring Framework", "Apache Web"],
+    node_vul={
+        PrintNightmare: 3, Spring4Shell: 8
+    },
+    node_value=10
+)
+
+eight = Node(
+    node_name="five",
+    node_id=8,
+    node_type="pc",
+    node_os="Linux",
+    node_ip="192.168.1.8",
+    node_services=["Shell", "Apache Struts2", "Oracle", "Web"],
+    node_vul={
+        BaronSamedit: 1, Struts2: 5, OracleWebLogicServer: 15
+    },
+    node_value=10
+)
+
+ten = Node(
+    node_name="ten",
+    node_id=10,
+    node_type="pc",
+    node_os="Windows",
+    node_ip="192.168.1.10",
+    node_services=["Oracle"],
+    node_vul={
+        OracleWebLogicServer: 1
+    },
+    node_value=10
+)
+
+twelve = Node(
+    node_name="twelve",
+    node_id=12,
+    node_type="pc",
+    node_os="Windows",
+    node_ip="192.168.1.12",
+    node_services=["Web", "Apache Log4j", "RDS"],
+    node_vul={
+        Log4Shell: 1, BlueKeep: 15
+    },
+    node_value=10
+)
+
+fifteen = Node(
+    node_name="fifteen",
+    node_id=15,
+    node_type="pc",
+    node_os="Windows",
+    node_ip="192.168.1.15",
+    node_services=["Spring", "SMB", "Oracle Server"],
+    node_vul={
+        Spring4Shell: 8, EternalBlue: 12
+    },
+    node_value=10
+)
 
 # 存放所有节点的字典(需要把所有节点补充进去)
-nodeList = {1: one, 2: two}
+nodeList = {1: one, 3: three, 5: five, 8: eight, 10: ten, 12: twelve, 15: fifteen}
 
