@@ -44,10 +44,12 @@ EternalBlue = Vulnerability(
     vul_authority="user",
     vul_confidentiality="high",
     vul_probability=0.8,
-    vul_reward=25,
-    vul_cost=35
+    vul_reward=24,
+    vul_cost=46
 )
-
+# print("=====================EternalBlue====================")
+# print(calculate(EternalBlue).vul_reward)
+# print(calculate(EternalBlue).vul_cost)
 
 # 漏洞影响Windows打印后台处理程序服务，攻击者可以利用这个漏洞执行远程代码或获得系统权限。
 # 概括：存在Windows中，攻破后的移动可自定义
@@ -66,9 +68,13 @@ PrintNightmare = Vulnerability(
     vul_authority="root",
     vul_confidentiality="low",
     vul_probability=0.7,
-    vul_reward=10,
-    vul_cost=50
+    vul_reward=-15,
+    vul_cost=85
 )
+# print("=====================PrintNightmare====================")
+# print(calculate(PrintNightmare).vul_reward)
+# print(calculate(PrintNightmare).vul_cost)
+
 
 # 该漏洞影响使用Sudo的Linux操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
 # 概括：存在Linux中，攻破后的移动可自定义
@@ -87,10 +93,12 @@ BaronSamedit = Vulnerability(
     vul_authority="user",
     vul_confidentiality="high",
     vul_probability=0.6,
-    vul_reward=29,
-    vul_cost=31
+    vul_reward=28,
+    vul_cost=42
 )
-
+# print("=====================BaronSamedit====================")
+# print(calculate(BaronSamedit).vul_reward)
+# print(calculate(BaronSamedit).vul_cost)
 """
 ================================远程漏洞========================================
 1. 定义为远程攻击
@@ -114,9 +122,13 @@ BlueKeep = Vulnerability(
     vul_authority="root",
     vul_confidentiality="exHigh",
     vul_probability=0.7,
-    vul_reward=38,
+    vul_reward=48,
     vul_cost=22
 )
+# print("=====================BlueKeep====================")
+# print(calculate(BlueKeep).vul_reward)
+# print(calculate(BlueKeep).vul_cost)
+
 
 # 产生于：漏洞存在于Java开发框架Spring的Core模块中
 # 影响：攻破后，该漏洞可影响web服务，即可访问存在web服务的电脑
@@ -136,9 +148,13 @@ Spring4Shell = Vulnerability(
     vul_authority="user",
     vul_confidentiality="exHigh",
     vul_probability=0.7,
-    vul_reward=43,
-    vul_cost=17
+    vul_reward=58,
+    vul_cost=12
 )
+# print("=====================Spring4Shell====================")
+# print(calculate(Spring4Shell).vul_reward)
+# print(calculate(Spring4Shell).vul_cost)
+
 
 # 产生于：漏洞存在于Oracle WebLogic Server的控制台组件和管理控制台
 # 影响：攻破后，该漏洞可控制Oracle数据库服务器
@@ -158,9 +174,13 @@ OracleWebLogicServer = Vulnerability(
     vul_authority="user",
     vul_confidentiality="low",
     vul_probability=0.5,
-    vul_reward=33,
-    vul_cost=27
+    vul_reward=36,
+    vul_cost=34
 )
+# print("=====================OracleWebLogicServer====================")
+# print(calculate(OracleWebLogicServer).vul_reward)
+# print(calculate(OracleWebLogicServer).vul_cost)
+
 
 # 产生于：漏洞存在于Apache Log4j 2中的JNDI功能（即一种java日志框架）
 # 影响：攻破后，该漏洞可访问存在Log4j（日志服务）的应用程序
@@ -180,9 +200,13 @@ Log4Shell = Vulnerability(
     vul_authority="user",
     vul_confidentiality="medium",
     vul_probability=0.9,
-    vul_reward=38,
-    vul_cost=22
+    vul_reward=51,
+    vul_cost=19
 )
+# print("=====================Log4Shell====================")
+# print(calculate(Log4Shell).vul_reward)
+# print(calculate(Log4Shell).vul_cost)
+
 
 # 产生于：漏洞存在于Java开发框架Apache Struts2的文件上传组件
 # 影响：攻破后，攻击者可以利用该漏洞访问和控制web应用程序
@@ -200,11 +224,14 @@ Struts2 = Vulnerability(
     vul_persistence="medium",
     vul_interaction="no",
     vul_authority="user",
-    vul_confidentiality="low",
+    vul_confidentiality="medium",
     vul_probability=0.6,
-    vul_reward=29,
-    vul_cost=31
+    vul_reward=47,
+    vul_cost=23
 )
+# print("=====================Struts2====================")
+# print(calculate(Struts2).vul_reward)
+# print(calculate(Struts2).vul_cost)
 
 """
 ================================节点========================================
@@ -249,7 +276,7 @@ five = Node(
     node_ip="192.168.1.5",
     node_services=["Print Spooler", "Apache Struts2", "Apache Web"],
     node_vul={
-        PrintNightmare: 3, Struts2: 8
+        EternalBlue: 3, Struts2: 8
     },
     node_value=10
 )
@@ -263,6 +290,19 @@ eight = Node(
     node_services=["Shell", "Apache Struts2", "Oracle", "Web"],
     node_vul={
         BaronSamedit: 1, OracleWebLogicServer: 5, Spring4Shell: 15
+    },
+    node_value=10
+)
+
+nine = Node(
+    node_name="nine",
+    node_id=9,
+    node_type="pc",
+    node_os="Linux",
+    node_ip="192.168.1.9",
+    node_services=["Spring"],
+    node_vul={
+        Spring4Shell: 15
     },
     node_value=10
 )
@@ -301,11 +341,11 @@ fifteen = Node(
     node_ip="192.168.1.15",
     node_services=["Spring", "SMB", "Oracle Server"],
     node_vul={
-        EternalBlue: 8, BlueKeep: 12
+        EternalBlue: 8, Struts2: 9, BlueKeep: 12
     },
     node_value=10
 )
 
 # 存放所有节点的字典(需要把所有节点补充进去)
-nodeList = {1: one, 3: three, 5: five, 8: eight, 10: ten, 12: twelve, 15: fifteen}
+nodeList = {1: one, 3: three, 5: five, 8: eight, 9: nine, 10: ten, 12: twelve, 15: fifteen}
 
