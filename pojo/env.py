@@ -4,9 +4,9 @@
 @Python：3.9
 """
 
-from firewall import Firewall
-from node import Node
-from vulnerability import Vulnerability
+from pojo.firewall import Firewall
+from pojo.node import Node
+from pojo.vulnerability import Vulnerability
 from calculate.vulCal import calculate
 
 """
@@ -44,9 +44,10 @@ EternalBlue = Vulnerability(
     vul_authority="user",
     vul_confidentiality="high",
     vul_probability=0.8,
-    vul_reward=22,
-    vul_cost=18
+    vul_reward=25,
+    vul_cost=35
 )
+
 
 # 漏洞影响Windows打印后台处理程序服务，攻击者可以利用这个漏洞执行远程代码或获得系统权限。
 # 概括：存在Windows中，攻破后的移动可自定义
@@ -65,8 +66,8 @@ PrintNightmare = Vulnerability(
     vul_authority="root",
     vul_confidentiality="low",
     vul_probability=0.7,
-    vul_reward=15,
-    vul_cost=25
+    vul_reward=10,
+    vul_cost=50
 )
 
 # 该漏洞影响使用Sudo的Linux操作系统，本地攻击者可以通过在系统上执行特制命令从而提权为root
@@ -86,8 +87,8 @@ BaronSamedit = Vulnerability(
     vul_authority="user",
     vul_confidentiality="high",
     vul_probability=0.6,
-    vul_reward=24,
-    vul_cost=16
+    vul_reward=29,
+    vul_cost=31
 )
 
 """
@@ -107,14 +108,14 @@ BlueKeep = Vulnerability(
     vul_protocol="RDP",
     vul_os="Windows",
     vul_desc="Exploiting Remote Desktop Services Vulnerability in Windows System",
-    vul_complexity="medium",
+    vul_complexity="low",
     vul_persistence="medium",
-    vul_interaction="yes",
+    vul_interaction="no",
     vul_authority="root",
     vul_confidentiality="exHigh",
     vul_probability=0.7,
-    vul_reward=23,
-    vul_cost=17
+    vul_reward=38,
+    vul_cost=22
 )
 
 # 产生于：漏洞存在于Java开发框架Spring的Core模块中
@@ -135,8 +136,8 @@ Spring4Shell = Vulnerability(
     vul_authority="user",
     vul_confidentiality="exHigh",
     vul_probability=0.7,
-    vul_reward=31,
-    vul_cost=9
+    vul_reward=43,
+    vul_cost=17
 )
 
 # 产生于：漏洞存在于Oracle WebLogic Server的控制台组件和管理控制台
@@ -157,8 +158,8 @@ OracleWebLogicServer = Vulnerability(
     vul_authority="user",
     vul_confidentiality="low",
     vul_probability=0.5,
-    vul_reward=27,
-    vul_cost=13
+    vul_reward=33,
+    vul_cost=27
 )
 
 # 产生于：漏洞存在于Apache Log4j 2中的JNDI功能（即一种java日志框架）
@@ -179,8 +180,8 @@ Log4Shell = Vulnerability(
     vul_authority="user",
     vul_confidentiality="medium",
     vul_probability=0.9,
-    vul_reward=29,
-    vul_cost=11
+    vul_reward=38,
+    vul_cost=22
 )
 
 # 产生于：漏洞存在于Java开发框架Apache Struts2的文件上传组件
@@ -201,8 +202,8 @@ Struts2 = Vulnerability(
     vul_authority="user",
     vul_confidentiality="low",
     vul_probability=0.6,
-    vul_reward=25,
-    vul_cost=15
+    vul_reward=29,
+    vul_cost=31
 )
 
 """
@@ -219,9 +220,9 @@ one = Node(
     node_type="pc",
     node_os="Linux",
     node_ip="192.168.1.1",
-    node_services=["Shell", "Spring Framework", "Oracle Server", "Apache Log4j"],
+    node_services=["Apache Log4j"],
     node_vul={
-        BaronSamedit: 10, Spring4Shell: 12
+        Log4Shell: 10, BaronSamedit: 12
     },
     node_value=10
 )
@@ -246,9 +247,9 @@ five = Node(
     node_type="pc",
     node_os="Windows",
     node_ip="192.168.1.5",
-    node_services=["Print Spooler", "Spring Framework", "Apache Web"],
+    node_services=["Print Spooler", "Apache Struts2", "Apache Web"],
     node_vul={
-        PrintNightmare: 3, Spring4Shell: 8
+        PrintNightmare: 3, Struts2: 8
     },
     node_value=10
 )
@@ -261,7 +262,7 @@ eight = Node(
     node_ip="192.168.1.8",
     node_services=["Shell", "Apache Struts2", "Oracle", "Web"],
     node_vul={
-        BaronSamedit: 1, Struts2: 5, OracleWebLogicServer: 15
+        BaronSamedit: 1, OracleWebLogicServer: 5, Spring4Shell: 15
     },
     node_value=10
 )
@@ -287,7 +288,7 @@ twelve = Node(
     node_ip="192.168.1.12",
     node_services=["Web", "Apache Log4j", "RDS"],
     node_vul={
-        Log4Shell: 1, BlueKeep: 15
+        EternalBlue: 1, PrintNightmare: 15
     },
     node_value=10
 )
@@ -300,7 +301,7 @@ fifteen = Node(
     node_ip="192.168.1.15",
     node_services=["Spring", "SMB", "Oracle Server"],
     node_vul={
-        Spring4Shell: 8, EternalBlue: 12
+        EternalBlue: 8, BlueKeep: 12
     },
     node_value=10
 )
