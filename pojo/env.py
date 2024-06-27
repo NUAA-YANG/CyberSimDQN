@@ -225,7 +225,7 @@ Struts2 = Vulnerability(
     vul_interaction="no",
     vul_authority="user",
     vul_confidentiality="medium",
-    vul_probability=0.6,
+    vul_probability=0.8,
     vul_reward=47,
     vul_cost=23
 )
