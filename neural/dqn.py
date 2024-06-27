@@ -3,11 +3,13 @@
 @Date：2024/6/21 15:07
 @Python：3.9
 """
+import random
+
 import numpy as np
 import torch
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, rcParams
 from torch import nn
-
+import networkx as nx
 from neural.net import Net
 
 
@@ -16,8 +18,8 @@ class DQN:
     # 状态空间大小、动作空间大小、利用GPU加速、经验池大小、学习率、奖励程度
     # 贪婪选择概率、最大贪婪选择概率、贪婪概率的增加率
     # 更新目标网络步数、随机抽取经验数量、连接矩阵
-    def __init__(self, statesLen, actionsLen, device, memorySize, learningRate, gamma, eGreedy, maxEGreedy,
-                 increaseRate, reloadStep, batchSize, coonArray, nodeVulList, staticReward, dynamicReward):
+    def __init__(self, statesLen, actionsLen, device, memorySize, learningRate, gamma, greedy, maxGreedy,
+                 increaseRate, reloadStep, batchSize, nodeList):
         # 状态空间大小
         self.statesLen = statesLen
         # 动作空间大小
@@ -31,17 +33,17 @@ class DQN:
         # 奖励程度
         self.gamma = gamma
         # 贪婪选择概率
-        self.eGreedy = eGreedy
+        self.greedy = greedy
         # 最大贪婪选择概率
-        self.maxEGreedy = maxEGreedy
+        self.maxGreedy = maxGreedy
         # 贪婪概率的增加率
         self.increaseRate = increaseRate
         # 每走多少步，更新一次target网络
         self.reloadStep = reloadStep
         # 从样本数据经验池中随机获得多少组经验
         self.batchSize = batchSize
-        # 连接矩阵
-        self.coonArray = coonArray
+        # 环境
+        self.nodeList = nodeList
 
         # 创建一个eval网络，计算当前状态下的 Q 值，估计当前策略的质量
         self.evalNet = Net(self.statesLen, self.actionsLen).to(self.device)
@@ -63,28 +65,99 @@ class DQN:
         # 记录损失值
         self.cost = []
 
-    # 动作选择，传入的参数为状态以及当前节点的漏洞
-    def chooseAction(self, state):
+    # 传入一个集合，随机选择一个节点作为初试状态
+    @staticmethod
+    def reset(nodeList):
+        keys = list(nodeList.keys())
+        return random.choice(keys)
+
+    # 构建掩码
+    def generateMask(self, state, passNode):
+        # 获取当前节点信息
+        node = self.nodeList[state]
+        # 获取当前节点的漏洞信息
+        node_vul = node.node_vul
+        # 生成掩码
+        # 如果节点包含2个漏洞，动作大小为3，则生成掩码为[1,1,0]，即表示存在两个漏洞
+        mask = []
+        for i in range(self.actionsLen):
+            if i < len(node_vul):
+                mask.append(1)
+            else:
+                mask.append(0)
+        # 排除已经选择过的节点
+        # 例如第二个漏洞已经被利用过，则掩码由[1,1,0]变为[1,0,0]
+        count = 0
+        for value in node_vul.values():
+            if value in passNode:
+                mask[count] = 0
+            count += 1
+        return mask
+
+    # 根据漏洞的序号获取漏洞的名称
+    def getVulByIndex(self, state, index):
+        # 获取当前节点信息
+        node = self.nodeList[state]
+        # 获取当前节点的漏洞信息
+        node_vul = node.node_vul
+        # 将键转换为列表
+        node_vul_list = list(node_vul.keys())
+        # 获取索引位置index的漏洞名称
+        return node_vul_list[index]
+
+    """
+    动作选择，传入的参数为当前节点信息：
+    """
+
+    def chooseAction(self, state, mask):
         # 动态变化贪婪选择概率，保证其逐渐增加
-        self.eGreedy = min(self.maxEGreedy, (self.eGreedy + self.increaseRate))
+        self.greedy = min(self.maxGreedy, (self.greedy + self.increaseRate))
         # 选择较大的值
-        if np.random.uniform() < self.eGreedy:
+        if np.random.uniform() < self.greedy:
             # 扩展一行,因为网络是多维矩阵,输入是至少两维，例如 state 为[2]，那么操作之后变成了[[2]]，同时将张量移动到GPU上
             stateTensor = torch.unsqueeze(torch.FloatTensor([state]), 0).to(self.device)
-            # 通过神经网络获取动作对应的值的集合
-            actionValueList = self.evalNet.forward(stateTensor)
-            # 获取最大的索引
-            action = torch.max(actionValueList, 1)[1].data.numpy()[0]
+            # 通过神经网络获取动作对应的值的集合（但是存在无效掩码的动作）
+            actionValueList = self.evalNet.forward(stateTensor).detach().cpu().numpy().squeeze()
+            # 将掩码为0的地方设置为-np.inf，而为1的地方直接设置为actionValueList的值
+            maskedActionValueList = np.where(mask, actionValueList, -np.inf)
+            action = np.argmax(maskedActionValueList)
         else:
-            action = np.random.randint(0, self.actionsLen)
+            # 掩码全部为0（代表该节点已经没有漏洞可用），随机选择一个漏洞
+            if set(mask) == {0}:
+                # 获取漏洞信息
+                node_vul = self.nodeList[state].node_vul
+                # 从所有漏洞中随机选择一个漏洞对应的索引
+                action = random.randrange(0, len(node_vul))
+            else:
+                # 掩码不是全部为0，则判定在第几个索引位置有值（即存在几个有效漏洞），例如mask=[1,1,0]，validActions=[0,1]
+                validActions = [i for i, valid in enumerate(mask) if valid]
+                # 从validActions中随机选择一个值
+                action = random.choice(validActions)
         return action
 
-    # 根据状态和动作推测下一个状态
-    @staticmethod
-    def getRewardAndNextState(state, action):
-        # 动态奖励值中获取值
-        reward = 0
-        nextState = action
+    # 根据动作推测下一个状态
+    # 这里的状态是节点，动作是选择某个漏洞的名字
+    def getRewardAndNextState(self, state, action):
+        # 获取当前节点信息
+        node = self.nodeList[state]
+        # 获取当前节点的所有漏洞信息
+        node_vul = node.node_vul
+        # 从当前节点状态下，动作对应的漏洞
+        vul = action
+        # 获取漏洞对应的转移节点
+        nextState = node_vul[vul]
+        # =========================获取固定奖励======================
+        reward = vul.vul_reward
+
+        # =========================动态渗透获取奖励======================
+        # # 对漏洞进行渗透，初始渗透次数为1
+        # count = 1
+        # # 随机数比渗透成功概率大，说明失败，需要再次渗透，次数+1
+        # while np.random.uniform() > vul.vul_probability:
+        #     count += 1
+        # # 到这里说明渗透成功，返回渗透奖励
+        # reward = vul.vul_reward - count * vul.vul_cost
+
         return reward, nextState
 
     # 存储学习经验，包括当前节点的名称，攻击节点的名称，奖励，下一个状态
@@ -117,13 +190,13 @@ class DQN:
         # 按照随机获得的索引值获取对应的行的记忆数据，此时memory是一个二维数组
         memory = self.memory[sampleIndex, :]
         # 从记忆当中获取【状态】列
-        state = torch.FloatTensor(memory[:, :self.statesLen]).to(self.device)
+        state = torch.FloatTensor(memory[:, :1]).to(self.device)
         # 从记忆当中获取【动作】列
-        action = torch.FloatTensor(memory[:, self.statesLen:self.statesLen * 2]).to(self.device)
+        action = torch.FloatTensor(memory[:, 1:2]).to(self.device)
         # 从记忆当中获取【奖励】列
-        reward = torch.FloatTensor(memory[:, self.statesLen * 2:self.statesLen * 2 + 1]).to(self.device)
+        reward = torch.FloatTensor(memory[:, 2:3]).to(self.device)
         # 从记忆当中获取【下一状态】列
-        nextState = torch.FloatTensor(memory[:, self.statesLen * 2 + 1:self.statesLen * 3 + 1]).to(self.device)
+        nextState = torch.FloatTensor(memory[:, 3:4]).to(self.device)
 
         # qEval 当前状态下执行动作的预测 value，即获取了所有状态-动作对应的值
         qEval = self.evalNet.forward(state).gather(1, action.to(torch.long))
@@ -149,4 +222,82 @@ class DQN:
         plt.xlabel(xLabel)
         plt.ylabel(yLabel)
         plt.title(title)
+        plt.show()
+
+
+    # 绘制路径图片
+    @staticmethod
+    def drawRouteImage(drawNode, drawVul):
+
+        rcParams['font.sans-serif'] = ['SimHei']  # 使用SimHei字体来支持中文
+        rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
+        # 创建一个有向图
+        G = nx.DiGraph()
+
+        # 添加节点和边，边上标注漏洞名称
+        edges = [
+            (5, 3, ''),
+            (5, 8, ''),
+            (8, 1, ''),
+            (8, 15, ''),
+            (1, 10, ''),
+            (1, 12, ''),
+            (12, 15, ''),
+            (15, 9, '')
+        ]
+        G.add_weighted_edges_from(edges)
+
+        # 设置节点的位置
+        positions = {
+            1: (0.5, 1),
+            3: (0, 0.6),
+            5: (0, 0.3),
+            8: (0, 0),
+            9: (1, 0.7),
+            15: (1.5, 0.5),
+            10: (0.5, 0),
+            12: (1, 0)
+        }
+
+        # 创建一个绘图
+        plt.figure(figsize=(10, 8))
+
+        # 绘制节点，用较大的实心点表示
+        nx.draw_networkx_nodes(G, pos=positions, node_size=800, node_color='lightgrey', edgecolors='black',
+                               linewidths=1)
+
+        # 绘制边，使用箭头表示
+        nx.draw_networkx_edges(G, pos=positions, arrowstyle='-', arrowsize=20, edge_color='black')
+
+        # 在边上添加漏洞名称
+        for (u, v, d) in G.edges(data=True):
+            x_start, y_start = positions[u]
+            x_end, y_end = positions[v]
+            x_mid = (x_start + x_end) / 2
+            y_mid = (y_start + y_end) / 2
+            plt.text(x_mid, y_mid, d['weight'], fontsize=12, color='red', ha='center', va='center')
+
+        # 添加节点标签
+        nx.draw_networkx_labels(G, pos=positions, labels={n: n for n in G.nodes()}, font_size=12, font_color='red')
+
+        highlight_path = drawNode
+        nx.draw_networkx_edges(G, pos=positions, edgelist=highlight_path, edge_color='blue', width=3, arrowstyle='->',
+                               arrowsize=25)
+
+        # 绘制特定的注释
+        path_texts = drawVul
+
+        for (u, v), text in path_texts.items():
+            x_start, y_start = positions[u]
+            x_end, y_end = positions[v]
+            x_mid = (x_start + x_end) / 2
+            y_mid = (y_start + y_end) / 2
+            plt.text(x_mid, y_mid, text, fontsize=12, color='blue', ha='center', va='center',
+                     bbox=dict(facecolor='white', edgecolor='none', alpha=0.7))
+
+        # 隐藏坐标轴
+        plt.axis('off')
+
+        # 显示图形
         plt.show()
